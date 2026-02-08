@@ -896,8 +896,46 @@ function Library:CreateWindow(Config)
                 pcall(Callback, Option)
             end
 
+            local function Refresh(NewOptions)
+                Options = NewOptions
+                for _, child in ipairs(Dropdown:GetChildren()) do
+                    if child:IsA("TextButton") and child ~= DropBtn then
+                        child:Destroy()
+                    end
+                end
+
+                for _, Option in ipairs(Options) do
+                    local OptBtn = Instance.new("TextButton")
+                    OptBtn.Size = UDim2.new(1, -10, 0, 25)
+                    OptBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+                    OptBtn.Text = Option
+                    OptBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+                    OptBtn.Font = Enum.Font.Gotham
+                    OptBtn.TextSize = 13
+                    OptBtn.Parent = Dropdown
+                    
+                    local OptCorner = Instance.new("UICorner")
+                    OptCorner.CornerRadius = UDim.new(0, 4)
+                    OptCorner.Parent = OptBtn
+
+                    OptBtn.MouseButton1Click:Connect(function()
+                        Open = false
+                        TweenService:Create(Icon, TweenInfo.new(0.3), {Rotation = 90}):Play()
+                        TweenService:Create(DropStroke, TweenInfo.new(0.3), {Color = Color3.fromRGB(60, 60, 60)}):Play()
+                        TweenService:Create(Dropdown, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, Height)}):Play()
+                        Set(Option)
+                    end)
+                end
+                if Open then
+                    TweenService:Create(Dropdown, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, Height + (#Options * 27) + 5)}):Play()
+                end
+            end
+
             if Flag then
-                UI.Elements[Flag] = { Set = function(self, val) Set(val) end }
+                UI.Elements[Flag] = { 
+                    Set = function(self, val) Set(val) end,
+                    Refresh = function(self, val) Refresh(val) end
+                }
                 UI.Flags[Flag] = Options[1]
             end
 
@@ -914,28 +952,7 @@ function Library:CreateWindow(Config)
                 end
             end)
 
-            for _, Option in ipairs(Options) do
-                local OptBtn = Instance.new("TextButton")
-                OptBtn.Size = UDim2.new(1, -10, 0, 25)
-                OptBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-                OptBtn.Text = Option
-                OptBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
-                OptBtn.Font = Enum.Font.Gotham
-                OptBtn.TextSize = 13
-                OptBtn.Parent = Dropdown
-                
-                local OptCorner = Instance.new("UICorner")
-                OptCorner.CornerRadius = UDim.new(0, 4)
-                OptCorner.Parent = OptBtn
-
-                OptBtn.MouseButton1Click:Connect(function()
-                    Open = false
-                    TweenService:Create(Icon, TweenInfo.new(0.3), {Rotation = 90}):Play()
-                    TweenService:Create(DropStroke, TweenInfo.new(0.3), {Color = Color3.fromRGB(60, 60, 60)}):Play()
-                    TweenService:Create(Dropdown, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, Height)}):Play()
-                    Set(Option)
-                end)
-            end
+            Refresh(Options)
         end
 
         function Tab:CreateKeybind(Text, Default, Callback, Settings)
