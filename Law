@@ -562,6 +562,15 @@ function Library:CreateWindow(Config)
             Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
             Button.Text = Text
             Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+            local BtnGradient = Instance.new("UIGradient")
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 50, 55)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 40))
+            }
+            BtnGradient.Rotation = 90
+            BtnGradient.Parent = Button
+            
             Button.Font = Enum.Font.GothamMedium
             Button.TextSize = 14
             Button.Parent = Page
@@ -599,6 +608,14 @@ function Library:CreateWindow(Config)
             ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
             ToggleBtn.Text = ""
             ToggleBtn.Parent = Page
+
+            local BtnGradient = Instance.new("UIGradient")
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 50, 55)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 40))
+            }
+            BtnGradient.Rotation = 90
+            BtnGradient.Parent = ToggleBtn
             
             local ToggleCorner = Instance.new("UICorner")
             ToggleCorner.CornerRadius = UDim.new(0, 6)
@@ -676,9 +693,17 @@ function Library:CreateWindow(Config)
 
             local Value = Default or Min
             local SliderFrame = Instance.new("Frame")
-            SliderFrame.Size = UDim2.new(1, 0, 0, 60)
+            SliderFrame.Size = UDim2.new(1, 0, 0, 50)
             SliderFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
             SliderFrame.Parent = Page
+
+            local BtnGradient = Instance.new("UIGradient")
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 50, 55)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 40))
+            }
+            BtnGradient.Rotation = 90
+            BtnGradient.Parent = SliderFrame
             
             local SliderCorner = Instance.new("UICorner")
             SliderCorner.CornerRadius = UDim.new(0, 6)
@@ -690,8 +715,8 @@ function Library:CreateWindow(Config)
             SliderStroke.Parent = SliderFrame
 
             local Label = Instance.new("TextLabel")
-            Label.Size = UDim2.new(1, 0, 0, 20)
-            Label.Position = UDim2.new(0, 15, 0, 8)
+            Label.Size = UDim2.new(1, -60, 0, 20)
+            Label.Position = UDim2.new(0, 15, 0, 5)
             Label.BackgroundTransparency = 1
             Label.Text = Text
             Label.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -702,7 +727,7 @@ function Library:CreateWindow(Config)
 
             local ValueLabel = Instance.new("TextLabel")
             ValueLabel.Size = UDim2.new(0, 40, 0, 20)
-            ValueLabel.Position = UDim2.new(1, -50, 0, 8)
+            ValueLabel.Position = UDim2.new(1, -50, 0, 5)
             ValueLabel.BackgroundTransparency = 1
             ValueLabel.Text = tostring(Value)
             ValueLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -712,7 +737,7 @@ function Library:CreateWindow(Config)
 
             local SliderBar = Instance.new("TextButton")
             SliderBar.Size = UDim2.new(1, -30, 0, 6)
-            SliderBar.Position = UDim2.new(0, 15, 0, 38)
+            SliderBar.Position = UDim2.new(0, 15, 0, 30)
             SliderBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
             SliderBar.Text = ""
             SliderBar.AutoButtonColor = false
@@ -778,9 +803,17 @@ function Library:CreateWindow(Config)
             if type(Settings) == "string" then Flag = Settings elseif type(Settings) == "table" then Flag = Settings.Flag end
 
             local InputFrame = Instance.new("Frame")
-            InputFrame.Size = UDim2.new(1, 0, 0, 60)
+            InputFrame.Size = UDim2.new(1, 0, 0, 40)
             InputFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
             InputFrame.Parent = Page
+
+            local BtnGradient = Instance.new("UIGradient")
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 50, 55)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 40))
+            }
+            BtnGradient.Rotation = 90
+            BtnGradient.Parent = InputFrame
             
             local InputCorner = Instance.new("UICorner")
             InputCorner.CornerRadius = UDim.new(0, 6)
@@ -792,8 +825,8 @@ function Library:CreateWindow(Config)
             InputStroke.Parent = InputFrame
 
             local Label = Instance.new("TextLabel")
-            Label.Size = UDim2.new(1, 0, 0, 20)
-            Label.Position = UDim2.new(0, 15, 0, 8)
+            Label.Size = UDim2.new(0.5, -15, 1, 0)
+            Label.Position = UDim2.new(0, 15, 0, 0)
             Label.BackgroundTransparency = 1
             Label.Text = Text
             Label.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -803,8 +836,8 @@ function Library:CreateWindow(Config)
             Label.Parent = InputFrame
 
             local TextBox = Instance.new("TextBox")
-            TextBox.Size = UDim2.new(1, -30, 0, 25)
-            TextBox.Position = UDim2.new(0, 15, 0, 30)
+            TextBox.Size = UDim2.new(0.5, -15, 0, 25)
+            TextBox.Position = UDim2.new(0.5, 0, 0.5, -12.5)
             TextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
             TextBox.Text = ""
             TextBox.PlaceholderText = Placeholder or "Type here..."
@@ -844,6 +877,14 @@ function Library:CreateWindow(Config)
             Dropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
             Dropdown.ClipsDescendants = true
             Dropdown.Parent = Page
+
+            local BtnGradient = Instance.new("UIGradient")
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 50, 55)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 40))
+            }
+            BtnGradient.Rotation = 90
+            BtnGradient.Parent = Dropdown
             
             local DropCorner = Instance.new("UICorner")
             DropCorner.CornerRadius = UDim.new(0, 6)
@@ -944,11 +985,19 @@ function Library:CreateWindow(Config)
                 if Open then
                     TweenService:Create(Icon, TweenInfo.new(0.3), {Rotation = -90}):Play()
                     TweenService:Create(DropStroke, TweenInfo.new(0.3), {Color = Accent}):Play()
-                    TweenService:Create(Dropdown, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, Height + (#Options * 27) + 5)}):Play()
+                    local tween = TweenService:Create(Dropdown, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, Height + (#Options * 27) + 5)})
+                    tween:Play()
+                    tween.Completed:Connect(function()
+                        Page.CanvasSize = UDim2.new(0, 0, 0, PageList.AbsoluteContentSize.Y + 15)
+                    end)
                 else
                     TweenService:Create(Icon, TweenInfo.new(0.3), {Rotation = 90}):Play()
                     TweenService:Create(DropStroke, TweenInfo.new(0.3), {Color = Color3.fromRGB(60, 60, 60)}):Play()
-                    TweenService:Create(Dropdown, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, Height)}):Play()
+                    local tween = TweenService:Create(Dropdown, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, Height)})
+                    tween:Play()
+                    tween.Completed:Connect(function()
+                        Page.CanvasSize = UDim2.new(0, 0, 0, PageList.AbsoluteContentSize.Y + 15)
+                    end)
                 end
             end)
 
@@ -964,6 +1013,14 @@ function Library:CreateWindow(Config)
             KeybindFrame.Size = UDim2.new(1, 0, 0, 40)
             KeybindFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
             KeybindFrame.Parent = Page
+
+            local BtnGradient = Instance.new("UIGradient")
+            BtnGradient.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 50, 55)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 40))
+            }
+            BtnGradient.Rotation = 90
+            BtnGradient.Parent = KeybindFrame
             
             local KeyCorner = Instance.new("UICorner")
             KeyCorner.CornerRadius = UDim.new(0, 6)
