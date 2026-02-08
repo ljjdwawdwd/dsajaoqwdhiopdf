@@ -1,0 +1,152 @@
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+
+local Library = {}
+
+function Library:CreateWindow(Config)
+    local Title = Config.Title or "UI Library"
+    local Accent = Config.Color or Color3.fromRGB(0, 120, 215)
+    local ToggleKey = Config.Keybind or Enum.KeyCode.RightControl
+
+    local UI = { Open = true }
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "FluentUI_" .. Title
+    ScreenGui.IgnoreGuiInset = true
+    ScreenGui.ResetOnSpawn = false
+
+    if pcall(function() ScreenGui.Parent = CoreGui end) then
+        ScreenGui.Parent = CoreGui
+    else
+        ScreenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+    end
+
+    local Main = Instance.new("Frame")
+    Main.Size = UDim2.new(0, 700, 0, 450)
+    Main.Position = UDim2.new(0.5, -350, 0.5, -225)
+    Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Main.BorderSizePixel = 0
+    Main.Parent = ScreenGui
+
+    local MainGradient = Instance.new("UIGradient")
+    MainGradient.Rotation = 45
+    MainGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 40)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 25))
+    }
+    MainGradient.Parent = Main
+
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 8)
+    MainCorner.Parent = Main
+
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Thickness = 1.5
+    MainStroke.Parent = Main
+
+    local StrokeGradient = Instance.new("UIGradient")
+    StrokeGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 60, 60)),
+        ColorSequenceKeypoint.new(0.5, Accent),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 60, 60))
+    }
+    StrokeGradient.Parent = MainStroke
+
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Size = UDim2.new(0, 200, 1, 0)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Sidebar.BorderSizePixel = 0
+    Sidebar.Parent = Main
+
+    local SidebarCorner = Instance.new("UICorner")
+    SidebarCorner.CornerRadius = UDim.new(0, 8)
+    SidebarCorner.Parent = Sidebar
+
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Size = UDim2.new(1, -30, 0, 50)
+    TitleLabel.Position = UDim2.new(0, 15, 0, 10)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Text = Title
+    TitleLabel.TextColor3 = Accent
+    TitleLabel.Font = Enum.Font.GothamBlack
+    TitleLabel.TextSize = 24
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.Parent = Sidebar
+
+    local Content = Instance.new("Frame")
+    Content.Size = UDim2.new(1, -200, 1, 0)
+    Content.Position = UDim2.new(0, 200, 0, 0)
+    Content.BackgroundTransparency = 1
+    Content.Parent = Main
+
+    UserInputService.InputBegan:Connect(function(input, gp)
+        if input.KeyCode == ToggleKey and not gp then
+            UI.Open = not UI.Open
+            Main.Visible = UI.Open
+        end
+    end)
+
+    local Tabs = {}
+    local FirstTab = true
+
+    function UI:CreateTab(Name)
+        local Tab = {}
+
+        local Page = Instance.new("ScrollingFrame")
+        Page.Size = UDim2.new(1, -30, 1, -20)
+        Page.Position = UDim2.new(0, 15, 0, 10)
+        Page.BackgroundTransparency = 1
+        Page.Visible = false
+        Page.Parent = Content
+
+        local function Activate()
+            for _, t in pairs(Tabs) do
+                t.Page.Visible = false
+            end
+            Page.Visible = true
+        end
+
+        if FirstTab then
+            FirstTab = false
+            Activate()
+        end
+
+        table.insert(Tabs, { Page = Page })
+
+        function Tab:CreateLabel(Text)
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(1, 0, 0, 25)
+            Label.BackgroundTransparency = 1
+            Label.Text = Text
+            Label.TextColor3 = Color3.fromRGB(200, 200, 200)
+            Label.Font = Enum.Font.Gotham
+            Label.TextSize = 14
+            Label.TextXAlignment = Enum.TextXAlignment.Left
+            Label.Parent = Page
+        end
+
+        function Tab:CreateButton(Text, Callback)
+            local Button = Instance.new("TextButton")
+            Button.Size = UDim2.new(1, 0, 0, 40)
+            Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            Button.Text = Text
+            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.Font = Enum.Font.GothamMedium
+            Button.TextSize = 14
+            Button.Parent = Page
+
+            Button.MouseButton1Click:Connect(function()
+                pcall(Callback)
+            end)
+        end
+
+        return Tab
+    end
+
+    return UI
+end
+
+return Library
