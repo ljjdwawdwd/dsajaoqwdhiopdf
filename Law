@@ -396,17 +396,24 @@ function Library:CreateWindow(Config)
         TabBtnCorner.CornerRadius = UDim.new(0, 6)
         TabBtnCorner.Parent = TabBtn
 
+        -- Container für Inhalt (Icon + Text)
+        local TabContent = Instance.new("Frame")
+        TabContent.Name = "Content"
+        TabContent.Size = UDim2.new(1, 0, 1, 0)
+        TabContent.BackgroundTransparency = 1
+        TabContent.Parent = TabBtn
+
         -- Layout für Icon und Text (Nebeneinander)
         local TabContentLayout = Instance.new("UIListLayout")
         TabContentLayout.FillDirection = Enum.FillDirection.Horizontal
         TabContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
         TabContentLayout.VerticalAlignment = Enum.VerticalAlignment.Center
         TabContentLayout.Padding = UDim.new(0, 12)
-        TabContentLayout.Parent = TabBtn
+        TabContentLayout.Parent = TabContent
 
         local TabPadding = Instance.new("UIPadding")
         TabPadding.PaddingLeft = UDim.new(0, 12)
-        TabPadding.Parent = TabBtn
+        TabPadding.Parent = TabContent
 
         -- Icon (Optional)
         local TabIcon = nil
@@ -417,7 +424,7 @@ function Library:CreateWindow(Config)
             TabIcon.Image = "rbxassetid://" .. tostring(IconId)
             TabIcon.ImageColor3 = Color3.fromRGB(150, 150, 150)
             TabIcon.LayoutOrder = 1
-            TabIcon.Parent = TabBtn
+            TabIcon.Parent = TabContent
         end
 
         -- Text Label
@@ -430,7 +437,7 @@ function Library:CreateWindow(Config)
         TabLabel.TextSize = 14
         TabLabel.TextXAlignment = Enum.TextXAlignment.Left
         TabLabel.LayoutOrder = 2
-        TabLabel.Parent = TabBtn
+        TabLabel.Parent = TabContent
 
         -- Indikator (Links)
         local TabIndicator = Instance.new("Frame")
