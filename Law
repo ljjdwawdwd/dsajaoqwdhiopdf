@@ -3,6 +3,7 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
+local HttpService = game:GetService("HttpService")
 
 --[[ 
     FLUENT UI LIBRARY V12 (Key System Integrated)
@@ -102,8 +103,29 @@ function Library:CreateWindow(Config)
     end
 
     local UI = {
-        Open = true
+        Open = true,
+        Flags = {},
+        Elements = {}
     }
+
+    function UI:SaveConfig(Name)
+        local Config = {}
+        for Flag, Value in pairs(UI.Flags) do
+            Config[Flag] = Value
+        end
+        writefile(Name .. ".json", HttpService:JSONEncode(Config))
+    end
+
+    function UI:LoadConfig(Name)
+        if isfile(Name .. ".json") then
+            local Config = HttpService:JSONDecode(readfile(Name .. ".json"))
+            for Flag, Value in pairs(Config) do
+                if UI.Elements[Flag] then
+                    UI.Elements[Flag]:Set(Value)
+                end
+            end
+        end
+    end
 
     -- GUI Erstellung
     local ScreenGui = Instance.new("ScreenGui")
@@ -618,8 +640,10 @@ function Library:CreateWindow(Config)
             CircleCorner.CornerRadius = UDim.new(1, 0)
             CircleCorner.Parent = Circle
 
-            ToggleBtn.MouseButton1Click:Connect(function()
-                Toggled = not Toggled
+            local function Set(Value)
+                Toggled = Value
+                if Flag then UI.Flags[Flag] = Toggled end
+
                 if Toggled then
                     TweenService:Create(Switch, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {BackgroundColor3 = Accent}):Play()
                     TweenService:Create(Circle, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Position = UDim2.new(1, -20, 0.5, -9)}):Play()
@@ -628,10 +652,28 @@ function Library:CreateWindow(Config)
                     TweenService:Create(Circle, TweenInfo.new(0.3, Enum.EasingStyle.Quint), {Position = UDim2.new(0, 2, 0.5, -9)}):Play()
                 end
                 pcall(Callback, Toggled)
+            end
+
+            if Flag then
+                UI.Elements[Flag] = {
+                    Set = function(self, Value) Set(Value) end
+                }
+                UI.Flags[Flag] = Default or false
+            end
+
+            if Default then
+                Set(true)
+            end
+
+            ToggleBtn.MouseButton1Click:Connect(function()
+                Set(not Toggled)
             end)
         end
 
-        function Tab:CreateSlider(Text, Min, Max, Default, Callback)
+        function Tab:CreateSlider(Text, Min, Max, Default, Callback, Settings)
+            local Flag = nil
+            if type(Settings) == "string" then Flag = Settings elseif type(Settings) == "table" then Flag = Settings.Flag end
+
             local Value = Default or Min
             local SliderFrame = Instance.new("Frame")
             SliderFrame.Size = UDim2.new(1, 0, 0, 60)
@@ -689,12 +731,27 @@ function Library:CreateWindow(Config)
             FillCorner.CornerRadius = UDim.new(1, 0)
             FillCorner.Parent = Fill
 
-            local function Update(Input)
-                local SizeX = math.clamp((Input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
+            local function Set(NewValue)
+                Value = math.clamp(NewValue, Min, Max)
+                if Flag then UI.Flags[Flag] = Value end
+                
+                local SizeX = (Value - Min) / (Max - Min)
                 TweenService:Create(Fill, TweenInfo.new(0.1), {Size = UDim2.new(SizeX, 0, 1, 0)}):Play()
-                local Value = math.floor(Min + ((Max - Min) * SizeX))
                 ValueLabel.Text = tostring(Value)
                 pcall(Callback, Value)
+            end
+
+            if Flag then
+                UI.Elements[Flag] = {
+                    Set = function(self, val) Set(val) end
+                }
+                UI.Flags[Flag] = Default or Min
+            end
+
+            local function Update(Input)
+                local SizeX = math.clamp((Input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
+                local Value = math.floor(Min + ((Max - Min) * SizeX))
+                Set(Value)
             end
 
             SliderBar.InputBegan:Connect(function(Input)
@@ -716,7 +773,10 @@ function Library:CreateWindow(Config)
             end)
         end
 
-        function Tab:CreateInput(Text, Placeholder, Callback)
+        function Tab:CreateInput(Text, Placeholder, Callback, Settings)
+            local Flag = nil
+            if type(Settings) == "string" then Flag = Settings elseif type(Settings) == "table" then Flag = Settings.Flag end
+
             local InputFrame = Instance.new("Frame")
             InputFrame.Size = UDim2.new(1, 0, 0, 60)
             InputFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -757,14 +817,28 @@ function Library:CreateWindow(Config)
             BoxCorner.CornerRadius = UDim.new(0, 4)
             BoxCorner.Parent = TextBox
 
+            if Flag then
+                UI.Elements[Flag] = {
+                    Set = function(self, val) 
+                        TextBox.Text = tostring(val)
+                        pcall(Callback, val)
+                    end
+                }
+                UI.Flags[Flag] = ""
+            end
+
             TextBox.FocusLost:Connect(function(Enter)
                 if Enter then
+                    if Flag then UI.Flags[Flag] = TextBox.Text end
                     pcall(Callback, TextBox.Text)
                 end
             end)
         end
 
-        function Tab:CreateDropdown(Text, Options, Callback)
+        function Tab:CreateDropdown(Text, Options, Callback, Settings)
+            local Flag = nil
+            if type(Settings) == "string" then Flag = Settings elseif type(Settings) == "table" then Flag = Settings.Flag end
+
             local Dropdown = Instance.new("Frame")
             Dropdown.Size = UDim2.new(1, 0, 0, 40)
             Dropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -816,6 +890,17 @@ function Library:CreateWindow(Config)
             local Open = false
             local Height = 40
 
+            local function Set(Option)
+                Label.Text = Text .. ": " .. Option
+                if Flag then UI.Flags[Flag] = Option end
+                pcall(Callback, Option)
+            end
+
+            if Flag then
+                UI.Elements[Flag] = { Set = function(self, val) Set(val) end }
+                UI.Flags[Flag] = Options[1]
+            end
+
             DropBtn.MouseButton1Click:Connect(function()
                 Open = not Open
                 if Open then
@@ -844,17 +929,19 @@ function Library:CreateWindow(Config)
                 OptCorner.Parent = OptBtn
 
                 OptBtn.MouseButton1Click:Connect(function()
-                    Label.Text = Text .. ": " .. Option
                     Open = false
                     TweenService:Create(Icon, TweenInfo.new(0.3), {Rotation = 90}):Play()
                     TweenService:Create(DropStroke, TweenInfo.new(0.3), {Color = Color3.fromRGB(60, 60, 60)}):Play()
                     TweenService:Create(Dropdown, TweenInfo.new(0.3), {Size = UDim2.new(1, 0, 0, Height)}):Play()
-                    pcall(Callback, Option)
+                    Set(Option)
                 end)
             end
         end
 
-        function Tab:CreateKeybind(Text, Default, Callback)
+        function Tab:CreateKeybind(Text, Default, Callback, Settings)
+            local Flag = nil
+            if type(Settings) == "string" then Flag = Settings elseif type(Settings) == "table" then Flag = Settings.Flag end
+
             local Key = Default or Enum.KeyCode.E
             local KeybindFrame = Instance.new("Frame")
             KeybindFrame.Size = UDim2.new(1, 0, 0, 40)
@@ -895,6 +982,17 @@ function Library:CreateWindow(Config)
             BindCorner.CornerRadius = UDim.new(0, 4)
             BindCorner.Parent = BindBtn
 
+            if Flag then
+                UI.Elements[Flag] = {
+                    Set = function(self, val)
+                        Key = val
+                        BindBtn.Text = Key.Name
+                        pcall(Callback, Key)
+                    end
+                }
+                UI.Flags[Flag] = Key
+            end
+
             local Listening = false
             BindBtn.MouseButton1Click:Connect(function()
                 Listening = true
@@ -907,6 +1005,7 @@ function Library:CreateWindow(Config)
                     Key = Input.KeyCode
                     BindBtn.Text = Key.Name
                     BindBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+                    if Flag then UI.Flags[Flag] = Key end
                     Listening = false
                     pcall(Callback, Key)
                 end
