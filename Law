@@ -601,7 +601,10 @@ function Library:CreateWindow(Config)
             end)
         end
 
-        function Tab:CreateToggle(Text, Callback)
+        function Tab:CreateToggle(Text, Default, Callback, Settings)
+            local Flag = nil
+            if type(Settings) == "string" then Flag = Settings elseif type(Settings) == "table" then Flag = Settings.Flag end
+
             local Toggled = false
             local ToggleBtn = Instance.new("TextButton")
             ToggleBtn.Size = UDim2.new(1, 0, 0, 40)
